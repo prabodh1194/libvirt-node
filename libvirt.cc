@@ -1,6 +1,8 @@
 #include <node.h>
 #include "virconnect.h"
+#include "virdomain.h"
 
+/*
 void __virConnectOpen(const FunctionCallbackInfo<Value>& args)
 {
     std::string uri = "qemu:///system";
@@ -11,13 +13,16 @@ void __virConnectOpen(const FunctionCallbackInfo<Value>& args)
         uri = std::string(*a1);
     }
     __virConnect *conn = new __virConnect(uri);
+    //wrap conn in args
     conn->New(args);
 }
+*/
 
 void InitAll(Local<Object> exports)
 {
-    NODE_SET_METHOD(exports,"open",__virConnectOpen);
+    //NODE_SET_METHOD(exports,"open",__virConnectOpen);
     __virConnect::Init(exports);
+    __virDomain::Init(exports);
 }
 
 NODE_MODULE(libvirt, InitAll)

@@ -1,12 +1,12 @@
-#ifndef VIRCONNECT_H
-#define VIRCONNECT_H
+#ifndef VIRDOMAIN_H
+#define VIRDOMAIN_H
 
 #include <iostream>
 #include <node.h>
 #include <libvirt/libvirt.h>
 #include <node_object_wrap.h>
 #include <string>
-#include "virdomain.h"
+#include "virconnect.h"
 
 using v8::Local;
 using v8::Object;
@@ -16,19 +16,18 @@ using v8::Local;
 using v8::Object;
 using v8::Isolate;
 
-class __virConnect : public node::ObjectWrap
+class __virDomain : public node::ObjectWrap
 {
     public:
-        virConnectPtr _conn;
+        virDomainPtr _dom;
         static void Init(Local<Object> exports);
         static void New(const v8::FunctionCallbackInfo<v8::Value>& args);
 
     private:
-        explicit __virConnect(std::string uri);
-        ~__virConnect();
+        explicit __virDomain(virDomainPtr dom);
+        ~__virDomain();
 
-        static void getURI(const v8::FunctionCallbackInfo<v8::Value>& args);
-        static void lookupByID(const FunctionCallbackInfo<Value>& args);
+        static void getID(const v8::FunctionCallbackInfo<v8::Value>& args);
         static v8::Persistent<v8::Function> constructor;
 };
 

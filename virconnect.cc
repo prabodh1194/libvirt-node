@@ -37,6 +37,7 @@ void __virConnect::Init(Local<Object> exports)
 
     // Prototype
     NODE_SET_PROTOTYPE_METHOD(tpl, "getURI", getURI);
+    NODE_SET_PROTOTYPE_METHOD(tpl, "lookupByID", lookupByID);
 
     constructor.Reset(isolate, tpl->GetFunction());
     exports->Set(String::NewFromUtf8(isolate, "__virConnect"), tpl->GetFunction());
@@ -79,4 +80,9 @@ void __virConnect::getURI(const FunctionCallbackInfo<Value>& args)
     __virConnect* obj = ObjectWrap::Unwrap<__virConnect>(args.Holder());
     std::string a = virConnectGetURI(obj->_conn);
     args.GetReturnValue().Set(String::NewFromUtf8(isolate, a.c_str()));
+}
+
+void __virConnect::lookupByID(const FunctionCallbackInfo<Value>& args)
+{
+    __virDomain::New(args);
 }
