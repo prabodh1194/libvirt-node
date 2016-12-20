@@ -1,6 +1,7 @@
 #ifndef VIRCONNECT_H
 #define VIRCONNECT_H
 
+#include <iostream>
 #include <node.h>
 #include <libvirt/libvirt.h>
 #include <node_object_wrap.h>
@@ -18,13 +19,12 @@ class __virConnect : public node::ObjectWrap
 {
     public:
         static void Init(Local<Object> exports);
-        static void NewInstance(const v8::FunctionCallbackInfo<v8::Value>& args);
+        explicit __virConnect(std::string uri);
+        static void New(const v8::FunctionCallbackInfo<v8::Value>& args);
 
     private:
         ~__virConnect();
 
-        explicit __virConnect(std::string uri);
-        static void New(const v8::FunctionCallbackInfo<v8::Value>& args);
         static void getURI(const v8::FunctionCallbackInfo<v8::Value>& args);
         static v8::Persistent<v8::Function> constructor;
         virConnectPtr _conn;

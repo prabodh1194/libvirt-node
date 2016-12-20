@@ -1,4 +1,4 @@
 // test.js
-const libvirt = require('./libvirt.js');
-conn = libvirt.open("qemu:///system")
+const libvirt = require('./build/Release/virt');
+conn = libvirt.open()
 console.log(conn.getURI());

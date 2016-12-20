@@ -29,6 +29,7 @@ __virConnect::~__virConnect()
 void __virConnect::Init(Local<Object> exports)
 {
     Isolate* isolate = exports->GetIsolate();
+
     // Prepare constructor template
     Local<FunctionTemplate> tpl = FunctionTemplate::New(isolate, New);
     tpl->SetClassName(String::NewFromUtf8(isolate, "__virConnect"));
@@ -43,9 +44,10 @@ void __virConnect::Init(Local<Object> exports)
 
 void __virConnect::New(const FunctionCallbackInfo<Value>& args)
 {
-    //Isolate* isolate = args.GetIsolate();
+    Isolate* isolate = args.GetIsolate();
 
-    if (args.IsConstructCall()) {
+    if (args.IsConstructCall())
+    {
         // Invoked as constructor: `new __virConnect(...)`
         std::string uri = "qemu:///system";
 
@@ -58,8 +60,8 @@ void __virConnect::New(const FunctionCallbackInfo<Value>& args)
         obj->Wrap(args.This());
         args.GetReturnValue().Set(args.This());
     }
-    /*
-    else {
+    else
+    {
         // Invoked as plain function `__virConnect(...)`, turn into construct call.
         const int argc = 1;
         Local<Value> argv[argc] = { args[0] };
@@ -68,20 +70,6 @@ void __virConnect::New(const FunctionCallbackInfo<Value>& args)
         Local<Object> instance = cons->NewInstance(context, argc, argv).ToLocalChecked();
         args.GetReturnValue().Set(instance);
     }
-    */
-}
-
-void __virConnect::NewInstance(const FunctionCallbackInfo<Value>& args)
-{
-    Isolate* isolate = args.GetIsolate();
-
-    const unsigned argc = 1;
-    Local<Value> argv[argc] = { args[0] };
-    Local<Function> cons = Local<Function>::New(isolate, constructor);
-    Local<Context> context = isolate->GetCurrentContext();
-    Local<Object> instance = cons->NewInstance(context, argc, argv).ToLocalChecked();
-
-    args.GetReturnValue().Set(instance);
 }
 
 void __virConnect::getURI(const FunctionCallbackInfo<Value>& args)
