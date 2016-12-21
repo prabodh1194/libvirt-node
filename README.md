@@ -16,3 +16,12 @@ node test.js
 ### Usage
 The API is similar to [libvirt-python](https://libvirt.org/python.html). This is
 a similar [API Reference](https://libvirt.org/devguide.html).
+
+### Development status
+This is an under construction API and entire code is a proof of concept for
+developing a node.js API generator.
+
+To test the generator
+'''
+python generator.py test.xml
+'''

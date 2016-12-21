@@ -16,6 +16,7 @@ class LibvirtHandler(xml.sax.ContentHandler):
         self.start = 0
         self.data = {'args':[]}
         self.title = ""
+        self.file = ""
         self.name = ""
         self.info = ""
 
@@ -27,16 +28,26 @@ class LibvirtHandler(xml.sax.ContentHandler):
         if self.start == 0:
             return
 
-        if tag == "macro" or tag == "function":
+        for k in attr._attrs:
+            attr._attrs[k] = str(attr._attrs[k])
+
+        if tag == "macro" or tag == "function" or tag == "enum":
             self.title = tag
             self.name = attr['name']
-            self.data['file'] = attr['file']
+            self.file = attr['file']
+
+            if tag == "macro" and self.file not in macro:
+                macro[self.file] = {}
+            if tag == "function" and self.file not in function:
+                function[self.file] = {}
+            if tag == "enum" and self.file not in enum:
+                enum[self.file] = {}
 
         if tag == "arg":
             self.data["args"] += [(attr['name'], attr['info'])]
 
         if tag == "enum":
-            enum[attr['name']] = {'file':attr['file'], 'value':attr['value'],
+            enum[attr['file']][attr['name']] = {'value':attr['value'],
                                   'type':attr['type'], 'info':attr['info'] if
                                                               'info' in attr else ' '}
 
@@ -52,12 +63,13 @@ class LibvirtHandler(xml.sax.ContentHandler):
         if tag == "macro" or tag == "function":
             self.data["info"] = self.info
             if tag == "macro":
-                macro[self.name] = self.data
+                macro[self.file][self.name] = self.data
             if tag == "function":
-                function[self.name] = self.data
+                function[self.file][self.name] = self.data
             self.data = {'args':[]}
             self.title = ""
             self.name = ""
+            self.file = ""
 
     # Call when a character is read
     def characters(self, content):
@@ -67,6 +79,7 @@ class LibvirtHandler(xml.sax.ContentHandler):
         self.info += content
 
 if __name__ == "__main__":
+    pp = pprint.PrettyPrinter(indent=4)
     # create an XMLReader
     parser = xml.sax.make_parser()
     # turn off namepsaces
@@ -74,9 +87,7 @@ if __name__ == "__main__":
     # override the default ContextHandler
     Handler = LibvirtHandler()
     parser.setContentHandler(Handler)
-    print sys.argv
     parser.parse(sys.argv[1])
-    pp = pprint.PrettyPrinter(indent=4)
     print "function"
     pp.pprint (function)
     print "macro"
