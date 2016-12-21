@@ -2,58 +2,69 @@
 The generator for node.js binding
 '''
 import xml.sax
+import sys
+import pprint
 
-class MovieHandler(xml.sax.ContentHandler):
+macro = {}
+function = {}
+enum = {}
+
+class LibvirtHandler(xml.sax.ContentHandler):
 
     ''' Parse given XML'''
-
     def __init__(self):
-        self.CurrentData = ""
-        self.type = ""
-        self.format = ""
-        self.year = ""
-        self.rating = ""
-        self.stars = ""
-        self.description = ""
+        self.start = 0
+        self.data = {'args':[]}
+        self.title = ""
+        self.name = ""
+        self.info = ""
 
     # Call when an element starts
-    def startElement(self, tag, attributes):
-        self.CurrentData = tag
-        if tag == "movie":
-            print "*****Movie*****"
-            title = attributes["title"]
-            print "Title:", title
+    def startElement(self, tag, attr):
+        if tag == "symbols":
+            self.start = 1
+
+        if self.start == 0:
+            return
+
+        if tag == "macro" or tag == "function":
+            self.title = tag
+            self.name = attr['name']
+            self.data['file'] = attr['file']
+
+        if tag == "arg":
+            self.data["args"] += [(attr['name'], attr['info'])]
+
+        if tag == "enum":
+            enum[attr['name']] = {'file':attr['file'], 'value':attr['value'],
+                                  'type':attr['type'], 'info':attr['info'] if
+                                                              'info' in attr else ' '}
+
+        if tag == "return":
+            self.data["return"] = (attr['type'], attr['info'] if 'info' in attr
+                                   else ' ')
 
     # Call when an elements ends
     def endElement(self, tag):
-        if self.CurrentData == "type":
-            print "Type:", self.type
-        elif self.CurrentData == "format":
-            print "Format:", self.format
-        elif self.CurrentData == "year":
-            print "Year:", self.year
-        elif self.CurrentData == "rating":
-            print "Rating:", self.rating
-        elif self.CurrentData == "stars":
-            print "Stars:", self.stars
-        elif self.CurrentData == "description":
-            print "Description:", self.description
-            self.CurrentData = ""
+        if self.start == 0:
+            return
+
+        if tag == "macro" or tag == "function":
+            self.data["info"] = self.info
+            if tag == "macro":
+                macro[self.name] = self.data
+            if tag == "function":
+                function[self.name] = self.data
+            self.data = {'args':[]}
+            self.title = ""
+            self.name = ""
 
     # Call when a character is read
     def characters(self, content):
-        if self.CurrentData == "type":
-            self.type = content
-        elif self.CurrentData == "format":
-            self.format = content
-        elif self.CurrentData == "year":
-            self.year = content
-        elif self.CurrentData == "rating":
-            self.rating = content
-        elif self.CurrentData == "stars":
-            self.stars = content
-        elif self.CurrentData == "description":
-            self.description = content
+        if self.start == 0:
+            return
+
+        self.info += content
 
 if __name__ == "__main__":
     # create an XMLReader
@@ -61,6 +72,14 @@ if __name__ == "__main__":
     # turn off namepsaces
     parser.setFeature(xml.sax.handler.feature_namespaces, 0)
     # override the default ContextHandler
-    Handler = MovieHandler()
+    Handler = LibvirtHandler()
     parser.setContentHandler(Handler)
-    parser.parse("mov.xml")
+    print sys.argv
+    parser.parse(sys.argv[1])
+    pp = pprint.PrettyPrinter(indent=4)
+    print "function"
+    pp.pprint (function)
+    print "macro"
+    pp.pprint (macro)
+    print "enum"
+    pp.pprint (enum)

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<api name='libvirt'>
+    <files>
+    </files>
+    <symbols>
+        <macro name='VIR_COPY_CPUMAP' file='libvirt-domain'>
+            <info><![CDATA[This macro is to be used in conjunction with virDomainGetVcpus() and virDomainPinVcpu() APIs. VIR_COPY_CPUMAP macro extracts the cpumap of the specified vcpu from cpumaps array and copies it into cpumap to be used later by virDomainPinVcpu() API.]]></info>
+            <arg name='cpumaps' info='pointer to an array of cpumap (in 8-bit bytes) (IN)'/>
+            <arg name='maplen' info='the length (in bytes) of one cpumap'/>
+            <arg name='vcpu' info='the virtual CPU number'/>
+            <arg name='cpumap' info='pointer to a cpumap (in 8-bit bytes) (OUT) This cpumap must be previously allocated by the caller (ie: malloc(maplen))'/>
+        </macro>
+        <macro name='VIR_CPU_MAPLEN' file='libvirt-domain'>
+            <info><![CDATA[This macro is to be used in conjunction with virDomainPinVcpu() API. It returns the length (in bytes) required to store the complete CPU map between a single virtual & all physical CPUs of a domain.]]></info>
+            <arg name='cpu' info='number of physical CPUs'/>
+        </macro>
+        <enum name='VIR_CONNECT_BASELINE_CPU_EXPAND_FEATURES' file='libvirt-host' value='1' type='virConnectBaselineCPUFlags' info='show all features'/>
+        <enum name='VIR_CONNECT_BASELINE_CPU_MIGRATABLE' file='libvirt-host' value='2' type='virConnectBaselineCPUFlags' info='filter out non-migratable features'/>
+        <function name='virTypedParamsGetUInt' file='libvirt-host' module='virtypedparam'>
+            <info><![CDATA[Finds typed parameter called @name and store its unsigned int value in
+@value. The function fails with VIR_ERR_INVALID_ARG error if the parameter
+does not have the expected type. By passing NULL as @value, the function
+may be used to check presence and type of the parameter.]]></info>
+            <return type='int' info='1 on success, 0 when the parameter does not exist in @params, or -1 on error.'/>
+            <arg name='params' type='virTypedParameterPtr' info='array of typed parameters'/>
+            <arg name='nparams' type='int' info='number of parameters in the @params array'/>
+            <arg name='name' type='const char *' info='name of the parameter to find'/>
+            <arg name='value' type='unsigned int *' info='where to store the parameter&apos;s value'/>
+        </function>
+        <function name='virTypedParamsGetULLong' file='libvirt-host' module='virtypedparam'>
+            <info><![CDATA[Finds typed parameter called @name and store its unsigned long long int
+value in @value. The function fails with VIR_ERR_INVALID_ARG error if the
+parameter does not have the expected type. By passing NULL as @value, the
+function may be used to check presence and type of the parameter.]]></info>
+            <return type='int' info='1 on success, 0 when the parameter does not exist in @params, or -1 on error.'/>
+            <arg name='params' type='virTypedParameterPtr' info='array of typed parameters'/>
+            <arg name='nparams' type='int' info='number of parameters in the @params array'/>
+            <arg name='name' type='const char *' info='name of the parameter to find'/>
+            <arg name='value' type='unsigned long long *' info='where to store the parameter&apos;s value'/>
+        </function>
+    </symbols>
+</api>
