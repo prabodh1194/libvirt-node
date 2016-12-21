@@ -69,6 +69,10 @@ void __virConnect::New(const FunctionCallbackInfo<Value>& args)
         Local<Function> cons = Local<Function>::New(isolate, constructor);
         Local<Context> context = isolate->GetCurrentContext();
         Local<Object> instance = cons->NewInstance(context, argc, argv).ToLocalChecked();
+
+        //define enum
+        instance->DefineOwnProperty(context, String::NewFromUtf8(isolate,"ENUM"), Number::New(isolate,1), v8::ReadOnly);
+
         args.GetReturnValue().Set(instance);
     }
 }
