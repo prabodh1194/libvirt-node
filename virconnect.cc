@@ -1,18 +1,5 @@
 // __virConnect.cc
-#include <string>
 #include "virconnect.h"
-
-using v8::Context;
-using v8::Function;
-using v8::FunctionCallbackInfo;
-using v8::FunctionTemplate;
-using v8::Isolate;
-using v8::Local;
-using v8::Number;
-using v8::Object;
-using v8::Persistent;
-using v8::String;
-using v8::Value;
 
 Persistent<Function> __virConnect::constructor;
 
@@ -45,35 +32,10 @@ void __virConnect::Init(Local<Object> exports)
 
 void __virConnect::New(const FunctionCallbackInfo<Value>& args)
 {
-    Isolate* isolate = args.GetIsolate();
-
+    // Invoked as constructor: `new __virConnect(...)`
     if (args.IsConstructCall())
     {
-        // Invoked as constructor: `new __virConnect(...)`
-        std::string uri = "qemu:///system";
-
-        if(!args[0]->IsUndefined())
-        {
-            v8::String::Utf8Value a1(args[0]->ToString());
-            uri = std::string(*a1);
-        }
-        __virConnect* obj = new __virConnect(uri);
-        obj->Wrap(args.This());
         args.GetReturnValue().Set(args.This());
-    }
-    else
-    {
-        // Invoked as plain function `__virConnect(...)`, turn into construct call.
-        const int argc = 1;
-        Local<Value> argv[argc] = { args[0] };
-        Local<Function> cons = Local<Function>::New(isolate, constructor);
-        Local<Context> context = isolate->GetCurrentContext();
-        Local<Object> instance = cons->NewInstance(context, argc, argv).ToLocalChecked();
-
-        //define enum
-        instance->DefineOwnProperty(context, String::NewFromUtf8(isolate,"ENUM"), Number::New(isolate,1), v8::ReadOnly);
-
-        args.GetReturnValue().Set(instance);
     }
 }
 
@@ -88,5 +50,24 @@ void __virConnect::getURI(const FunctionCallbackInfo<Value>& args)
 
 void __virConnect::lookupByID(const FunctionCallbackInfo<Value>& args)
 {
-    __virDomain::New(args);
+
+    int domID = args[0]->NumberValue();
+    __virConnect* obj = ObjectWrap::Unwrap<__virConnect>(args.Holder());
+
+    virDomainPtr domain = virDomainLookupByID(obj->_conn, domID);
+    __virDomain *dom = new __virDomain(domain);
+
+    dom->wrap(args);
+}
+
+void __virConnect::wrap(const FunctionCallbackInfo<Value>& args)
+{
+    Isolate* isolate = args.GetIsolate();
+
+    Local<Function> cons = Local<Function>::New(isolate, constructor);
+    Local<Context> context = isolate->GetCurrentContext();
+    Local<Object> instance = cons->NewInstance(context).ToLocalChecked();
+
+    this->Wrap(instance);
+    args.GetReturnValue().Set(instance);
 }
