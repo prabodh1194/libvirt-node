@@ -22,6 +22,6 @@ This is an under construction API and entire code is a proof of concept for
 developing a node.js API generator.
 
 To test the generator
-'''
+```bash
 python generator.py test.xml
-'''
+```
